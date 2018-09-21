@@ -1,8 +1,6 @@
 Ansistrano
 ==========
 
-[![Build Status](https://travis-ci.org/ansistrano/rollback.svg?branch=master)](https://travis-ci.org/ansistrano/rollback)
-
 **ansistrano.deploy** and **ansistrano.rollback** are Ansible roles to easily manage the deployment process for scripting applications such as PHP, Python and Ruby. It's an Ansible port for Capistrano.
 
 History
@@ -24,57 +22,12 @@ Early adopters
 
 If you were an early adopter, you should know we have broken BC by moving from using `ansistrano_custom_tasks_path` to individual and specific files per step. See "Role Variables". **The role displays a warning if the variable is defined and although your old playbooks may still run with no errors, you will see that your code is uploaded but custom tasks are not run.**
 
-Ansistrano anonymous usage stats
---------------------------------
-
-We have recently added an extra optional step in Ansistrano so that we can know how many people are deploying their applications with our project. Unfortunately, Ansible Galaxy does not provide any numbers on usage or downloads so this is one of the only ways we have to measure how many users we really have.
-
-You can check the code we use to store your anonyomus stats at [the ansistrano.com repo](https://github.com/ansistrano/ansistrano.com) and anyway, if you are not comfortable with this, you will always be able to disable this extra step by setting `ansistrano_allow_anonymous_stats` to false in your playbooks.
-
-Who is using Ansistrano?
-------------------------
-
-Is Ansistrano ready to be used? Here are some companies currently using it:
-
-* [Atrápalo](http://www.atrapalo.com)
-* [Another Place Productions](http://www.anotherplaceproductions.com)
-* [Suntransfers](http://www.suntransfers.com)
-* [Ulabox](https://www.ulabox.com)
-* [Euromillions.com](http://euromillions.com/)
-* [Uvinum](http://www.uvinum.com)
-* [Cycloid](http://www.cycloid.io)
-* [Spotahome](https://www.spotahome.com)
-* [Ofertix](http://www.ofertix.com)
-* [Nice&Crazy](http://www.niceandcrazy.com)
-* [Gstock](http://www.g-stock.es)
-* [CMP Group](http://www.teamcmp.com)
-
-If you are also using it, please let us know via a PR to this document.
-
 Requirements
 ------------
 
 In order to deploy your apps with Ansistrano, you will need:
 
 * Ansible in your deployer machine
-
-Installation
-------------
-
-Ansistrano is an Ansible role distributed globally using [Ansible Galaxy](https://galaxy.ansible.com/). In order to install Ansistrano role you can use the following command.
-
-```
-$ ansible-galaxy install ansistrano.deploy ansistrano.rollback
-```
-
-Update
-------
-
-If you want to update the role, you need to pass **--force** parameter when installing. Please, check the following command:
-
-```
-$ ansible-galaxy install --force ansistrano.deploy ansistrano.rollback
-```
 
 Features
 --------
@@ -106,7 +59,6 @@ vars:
   ansistrano_current_dir: "current" # Softlink name. You should rarely changed it.
   ansistrano_rollback_to_release: "" # If specified, the application will be rolled back to this release version; previous release otherwise.
   ansistrano_remove_rolled_back: yes # You can change this setting in order to keep the rolled back release in the server for later inspection
-  ansistrano_allow_anonymous_stats: yes
 
   # Hooks: custom tasks if you need them
   ansistrano_before_symlink_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-symlink-tasks.yml"
@@ -124,7 +76,7 @@ In order to deploy with Ansistrano, you need to perform some steps:
 
 * Create a new `hosts` file. Check [ansible inventory documentation](http://docs.ansible.com/intro_inventory.html) if you need help. This file will identify all the hosts where to deploy to. For multistage environments check "Multistage environments"
 * Create a new playbook for deploying your app, for example, deploy.yml
-* Include carlosbuenosvinos.ansible-deploy role
+* Include the `ansistrano.deploy` role as part of a play
 * Set up role variables (see "Role Variables")
 * Run the deployment playbook
 
@@ -257,89 +209,6 @@ Let's see three deployments with an `ansistrano_keep_releases: 2` configuration:
 ```
 
 See how the release `20100509145325` has been removed.
-
-Example Playbook
-----------------
-
-In the folder, `example` you can check an example project that shows how to deploy with Ansistrano. In order to run it, you should:
-
-```
-$ cd example
-$ ansible-playbook -i hosts deploy.yml
-```
-
-Sample projects
----------------
-
-We have added Ansistrano support for other projects we are working on.
-
-* LastWishes: Domain-Driven Design PHP Sample App: https://github.com/dddinphp/last-wishes
-
-As an example, see the execution log of the LastWishes deployment:
-
-```
-PLAY [Deploy last wishes app to my server] ************************************
-
-GATHERING FACTS ***************************************************************
-ok: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Ensure deployment base path exists] ***
-ok: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Ensure releases folder exists] ***
-ok: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Ensure shared elements folder exists] ***
-ok: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Get release timestamp] ***********
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Get release path] ****************
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Get releases path] ***************
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Get shared path (in rsync case)] ***
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Rsync application files to remote shared copy (in rsync case)] ***
-changed: [quepimquepam.com -> 127.0.0.1]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Deploy existing code to servers] ***
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Deploy existing code to remote servers] ***
-skipping: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Update remote repository] ********
-skipping: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Export a copy of the repo] *******
-skipping: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Deploy code from to servers] *****
-skipping: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Copy release version into REVISION file] ***
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Touches up the release code] *****
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Change softlink to new release] ***
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Reload Apache] *******************
-changed: [quepimquepam.com]
-
-TASK: [carlosbuenosvinos.ansistrano-deploy | Clean up releases] ***************
-skipping: [quepimquepam.com]
-
-PLAY RECAP ********************************************************************
-quepimquepam.com           : ok=14   changed=10   unreachable=0    failed=0
-```
 
 License
 -------
